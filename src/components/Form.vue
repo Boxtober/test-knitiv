@@ -1,10 +1,7 @@
 <template>
     <div>
         <form @submit.prevent="saveForm">
-            <div
-                v-for="component in config.form.components"
-                :key="component.key"
-            >
+            <div v-for="component in json.form.components" :key="component.key">
                 <component
                     :is="getComponentType(component.type)"
                     :uniqueKey="component.key"
@@ -18,10 +15,12 @@
                     :disabled="component.disabled"
                     :listComponents="component.components"
                     :personData="
-                        component.key ? config.data[component.key] : undefined
+                        component.key ? json.data[component.key] : undefined
                     "
+                    :data="json.data"
                 />
             </div>
+
             <div v-if="!isFormValid" class="error">
                 <p>Veuillez remplir tous les champs requis correctement.</p>
             </div>
@@ -51,27 +50,22 @@ export default defineComponent({
         List,
     },
     props: {
-        config: {
+        json: {
             type: Object,
             required: true,
         },
-        // Components: {
-        //     type: Array as () => Component[],
-        //     required: true,
-        // },
     },
     setup(props) {
         const formData = ref<{ [key: string]: any }>({});
 
         // Init datas du formulaire
         watch(
-            () => props.config,
-            (newConfig) => {
-                if (newConfig.data) {
-                    Object.keys(newConfig.data).forEach((key) => {
+            () => props.json,
+            (newJson) => {
+                if (newJson.data) {
+                    Object.keys(newJson.data).forEach((key) => {
                         if (!formData.value[key]) {
-                            formData.value[key] =
-                                newConfig.data[key].value || "";
+                            formData.value[key] = newJson.data[key].value || "";
                         }
                     });
                 }
@@ -111,20 +105,18 @@ export default defineComponent({
         };
 
         const isFormValid = computed(() => {
-            return props.config.form.components.every(
-                (component: Component) => {
-                    const key = component.key;
-                    const value = formData.value[key] || "";
-                    const validation = component.validation;
-                    const required = component.required;
+            return props.json.form.components.every((component: Component) => {
+                const key = component.key;
+                const value = formData.value[key] || "";
+                const validation = component.validation;
+                const required = component.required;
 
-                    const isValid = validateField(key, value, validation);
-                    const isRequiredValid =
-                        !required || (required && value.trim().length > 0);
+                const isValid = validateField(key, value, validation);
+                const isRequiredValid =
+                    !required || (required && value.trim().length > 0);
 
-                    return isValid && isRequiredValid;
-                }
-            );
+                return isValid && isRequiredValid;
+            });
         });
 
         const saveForm = () => {

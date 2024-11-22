@@ -2,14 +2,8 @@
     "data": {
         "john_doe": {
             "name": "John Doe",
-            "projects": [
-                "project_1",
-                "project_2"
-            ],
-            "notes": [
-                "note_1",
-                "note_2"
-            ],
+            "projects": ["project_1", "project_2"],
+            "notes": ["note_1", "note_2"],
             "age": 30,
             "gender": "male",
             "address": {
@@ -32,10 +26,7 @@
         },
         "project_1": {
             "name": "Project 1",
-            "tasks": [
-                "task_1",
-                "task_2"
-            ]
+            "tasks": ["task_1", "task_2"]
         },
         "project_2": {
             "name": "Project 2"

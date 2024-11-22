@@ -6,6 +6,7 @@
             :id="uniqueKey"
             :required="required"
             :disabled="disabled"
+            :validation="validation"
             v-model="formData[uniqueKey]"
         />
     </div>

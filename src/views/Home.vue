@@ -1,7 +1,7 @@
 <template>
     <h2>Formulaire 1</h2>
     <div>
-        <Form :config="formConfig" />
+        <Form :json="json" />
     </div>
 </template>
 
@@ -17,7 +17,7 @@ export default defineComponent({
     },
     data() {
         return {
-            formConfig: formDataJson, // Passez le JSON complet à Form
+            json: formDataJson, // Passez le JSON complet à Form
         };
     },
 });

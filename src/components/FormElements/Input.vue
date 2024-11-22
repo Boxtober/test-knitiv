@@ -7,6 +7,7 @@
             :required="required"
             :disabled="disabled"
             v-model="formData[uniqueKey]"
+            :validation="validation"
         />
     </div>
 </template>

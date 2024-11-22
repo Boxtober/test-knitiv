@@ -1,9 +1,9 @@
 <template>
     <nav class="navbar">
         <div class="nav-contain">
-            <router-link to="/">HOME</router-link>
-            <router-link to="/about">ABOUT</router-link>
-            <router-link to="/contact">CONTACT</router-link>
+            <router-link to="/">FORM 1</router-link>
+            <router-link to="/about">FORM 2</router-link>
+            <router-link to="/contact">FORM 3</router-link>
             <!-- nav dynamique sans rechargement -->
         </div>
     </nav>

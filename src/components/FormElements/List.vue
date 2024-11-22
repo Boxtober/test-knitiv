@@ -48,20 +48,15 @@ export default defineComponent({
             type: Array as () => Component[],
             required: true,
         },
-        formData: {
-            type: Object as () => { [key: string]: any },
-            required: true,
-        },
     },
     setup(props) {
         const formData = ref<{ [key: string]: any }>({});
-
         // Init datas du formulaire
         watch(
             () => props.listComponents,
-            (newConfig) => {
-                if (newConfig) {
-                    newConfig.forEach((component: any) => {
+            (newJson) => {
+                if (newJson) {
+                    newJson.forEach((component: any) => {
                         if (component.key && !formData.value[component.key]) {
                             formData.value[component.key] = "";
                         }
