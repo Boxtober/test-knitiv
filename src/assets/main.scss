@@ -1,0 +1,22 @@
+$bg-primary: #f4edea;
+$bg-secondary: #f69b51;
+$color: rgb(95, 93, 91);
+
+input,
+select,
+option {
+    border-radius: 16px;
+    padding: .5rem 1rem;
+    border: none;
+    margin: .5rem;
+    min-width: 200px;
+    width: 200px;
+    border: $color 1px solid;
+    cursor: pointer;
+}
+
+label {
+    font-weight: bolder;
+    margin-right: 1rem;
+    text-transform: uppercase;
+}

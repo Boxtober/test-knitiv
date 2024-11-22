@@ -1,122 +1,159 @@
 <template>
-    <form @submit.prevent="handleSubmit">
-        <div class="input-container">
-            <label for="name">Nom: </label>
-            <p>{{ data.john_doe.name }}</p>
-            <input id="name" v-model="data.john_doe.name" type="text" />
-        </div>
-
-        <div class="input-container">
-            <label for="age">Age:</label>
-            <p>{{ data.john_doe.age }}</p>
-            <input id="age" v-model="data.john_doe.age" type="number" />
-        </div>
-
-        <div class="input-container">
-            <label for="gender">Genre: </label>
-            <p>{{ data.john_doe.gender }}</p>
-            <select
-                id="gender"
-                ref="genderSelect"
-                v-model="data.john_doe.gender"
+    <div>
+        <form @submit.prevent="saveForm">
+            <div
+                v-for="component in config.form.components"
+                :key="component.key"
             >
-                <option
-                    v-for="(gender, index) in genderOptions"
-                    :key="index"
-                    :value="gender.value"
-                >
-                    {{ gender.label }}
-                </option>
-            </select>
-        </div>
-
-        <div class="input-container">
-            <label for="date_1">Date:</label>
-            <p>{{ data.date_1.value }}</p>
-            <input id="date_1" v-model="data.date_1.value" type="date" />
-        </div>
-
-        <div class="input-container">
-            <label for="input_1">Texte:</label>
-            <p>{{ data.input_1.value }}</p>
-            <input id="input_1" v-model="data.input_1.value" type="text" />
-        </div>
-
-        <div class="input-container">
-            <label for="select_1">Sélection:</label>
-            <p>{{ data.select_1.value }}</p>
-            <select id="select_1" v-model="data.select_1.value">
-                <option
-                    v-for="option in options"
-                    :key="index"
-                    :value="option.value"
-                >
-                    {{ option.label }}
-                </option>
-            </select>
-        </div>
-
-        <div v-if="!isFormValid" class="error">
-            <p>Veuillez remplir tous les champs requis correctement.</p>
-        </div>
-
-        <Button :isFormValid="isFormValid" @save="handleSave" />
-    </form>
+                <component
+                    :is="getComponentType(component.type)"
+                    :uniqueKey="component.key"
+                    :label="component.label"
+                    :formData="formData"
+                    :options="
+                        component.options ? component.options.items : undefined
+                    "
+                    :validation="component.validation"
+                    :required="component.required"
+                    :disabled="component.disabled"
+                    :listComponents="component.components"
+                    :personData="
+                        component.key ? config.data[component.key] : undefined
+                    "
+                />
+            </div>
+            <div v-if="!isFormValid" class="error">
+                <p>Veuillez remplir tous les champs requis correctement.</p>
+            </div>
+            <button type="submit" :disabled="!isFormValid">Enregistrer</button>
+        </form>
+    </div>
 </template>
 
-<script setup lang="ts">
-import Button from "./Button.vue";
-import { computed, defineProps } from "vue";
+<script lang="ts">
+import { defineComponent, ref, watch, computed } from "vue";
+import Button from "./FormElements/Button.vue";
+import Input from "./FormElements/Input.vue";
+import Date from "./FormElements/Date.vue";
+import Select from "./FormElements/Select.vue";
+import Person from "./FormElements/Person.vue";
+import List from "./FormElements/List.vue";
+import { Component } from "../types/form";
 
-const props = defineProps({
-    data: {
-        type: Object,
-        required: true,
+export default defineComponent({
+    name: "Form",
+    components: {
+        Button,
+        Input,
+        Date,
+        Select,
+        Person,
+        List,
+    },
+    props: {
+        config: {
+            type: Object,
+            required: true,
+        },
+        // Components: {
+        //     type: Array as () => Component[],
+        //     required: true,
+        // },
+    },
+    setup(props) {
+        const formData = ref<{ [key: string]: any }>({});
+
+        // Init datas du formulaire
+        watch(
+            () => props.config,
+            (newConfig) => {
+                if (newConfig.data) {
+                    Object.keys(newConfig.data).forEach((key) => {
+                        if (!formData.value[key]) {
+                            formData.value[key] =
+                                newConfig.data[key].value || "";
+                        }
+                    });
+                }
+            },
+            { immediate: true }
+        );
+
+        const getComponentType = (type: string) => {
+            const componentMap: { [key: string]: string | null } = {
+                button: "Button",
+                date: "Date",
+                input: "Input",
+                select: "Select",
+                person: "Person",
+                list: "List",
+            };
+
+            return componentMap[type] || null;
+        };
+
+        // validation des champs individuels
+        const validateField = (key: string, value: any, validation: string) => {
+            if (!validation) return true;
+
+            // map des types de validation
+            const validationRules: { [key: string]: (value: any) => boolean } =
+                {
+                    email: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
+                    number: (value) => !isNaN(value) && value !== "",
+                    date: (value) => /^\d{4}-\d{2}-\d{2}$/.test(value),
+                    default: (value) => value.trim().length > 0,
+                };
+
+            const validate =
+                validationRules[validation] || validationRules.default;
+            return validate(value);
+        };
+
+        const isFormValid = computed(() => {
+            return props.config.form.components.every(
+                (component: Component) => {
+                    const key = component.key;
+                    const value = formData.value[key] || "";
+                    const validation = component.validation;
+                    const required = component.required;
+
+                    const isValid = validateField(key, value, validation);
+                    const isRequiredValid =
+                        !required || (required && value.trim().length > 0);
+
+                    return isValid && isRequiredValid;
+                }
+            );
+        });
+
+        const saveForm = () => {
+            console.log(
+                "---> FormData.value : ",
+                JSON.stringify(formData.value)
+            );
+        };
+
+        return {
+            formData,
+            getComponentType,
+            saveForm,
+            isFormValid,
+        };
     },
 });
-
-const data = props.data;
-// const component = ref({});
-// const selectOptions = computed(() => {
-//     return (
-//         data.form.components.find(
-//             (component: any) => component.key === "select_1"
-//         )?.options?.items || []
-//     );
-// });
-
-const isFormValid = computed(() => {
-    const { name, age, gender } = data.john_doe;
-    const { value: date } = data.date_1;
-    const { value: input } = data.input_1;
-    const { value: select } = data.select_1;
-
-    return name && age && gender && date && input && select;
-});
-
-const handleSave = () => {
-    if (isFormValid.value) {
-        const validatedData = {
-            name: data.john_doe.name,
-            age: data.john_doe.age,
-            gender: data.john_doe.gender,
-            date: data.date_1.value,
-            input: data.input_1.value,
-            select: data.select_1.value,
-        };
-        console.log("DATAS :", validatedData);
-    }
-};
 </script>
 
 <style scoped lang="scss">
-$bg-primary: #f4edea;
+@import "../assets/main.scss";
 form {
-    color: rgb(95, 94, 91);
+    color: $color;
     background-color: $bg-primary;
     padding: 1rem;
     border-radius: 25px;
-
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
     .input-container {
         display: flex;
         align-items: center;

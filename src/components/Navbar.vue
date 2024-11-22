@@ -4,6 +4,7 @@
             <router-link to="/">HOME</router-link>
             <router-link to="/about">ABOUT</router-link>
             <router-link to="/contact">CONTACT</router-link>
+            <!-- nav dynamique sans rechargement -->
         </div>
     </nav>
 </template>
@@ -28,17 +29,16 @@ export default {
     font-size: 20px;
     width: 80vh;
     justify-content: space-between;
-}
-
-.nav-contain {
-    display: flex;
-    flex-wrap: inherit;
-    align-items: center;
-    justify-content: space-between;
-    gap: 2rem;
-    font-size: 20px;
-    text-decoration: none;
-    margin: 0 10px;
-    font-weight: bold;
+    .nav-contain {
+        display: flex;
+        flex-wrap: inherit;
+        align-items: center;
+        justify-content: space-between;
+        gap: 2rem;
+        font-size: 20px;
+        text-decoration: none;
+        margin: 0 10px;
+        font-weight: bold;
+    }
 }
 </style>

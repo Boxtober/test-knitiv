@@ -1,25 +1,24 @@
 <template>
+    <h2>Formulaire 1</h2>
     <div>
-        <h1>Page 1</h1>
-        <Form v-if="json.data" :data="json.data" />
-        <p v-else>Not found !</p>
+        <Form :config="formConfig" />
     </div>
 </template>
 
-<script setup lang="ts">
-import { ref, onMounted } from "vue";
+<script lang="ts">
+import { defineComponent } from "vue";
 import Form from "../components/Form.vue";
+import formDataJson from "../../public/datas/json1.json";
 
-const json = ref({});
-
-const loadData = () => {
-    fetch("../../public/datas/json1.json")
-        .then((response) => response.json())
-        .then((data) => {
-            json.value = data;
-        })
-        .catch((error) => console.error("Error:", error));
-};
-
-onMounted(loadData);
+export default defineComponent({
+    name: "Home",
+    components: {
+        Form,
+    },
+    data() {
+        return {
+            formConfig: formDataJson, // Passez le JSON complet à Form
+        };
+    },
+});
 </script>
